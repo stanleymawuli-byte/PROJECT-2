@@ -27,7 +27,12 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid username or password.' });
     }
     if (!user.totp_enabled) {
-      return res.status(403).json({ error: 'Multi-factor authentication must be enrolled before this account can sign in.', code: 'MFA_ENROLLMENT_REQUIRED' });
+      const setupToken = jwt.sign(
+        { sub: user.id, username: user.username, role: user.role, mfa_setup: true },
+        process.env.JWT_SECRET,
+        { algorithm: 'HS256', expiresIn: '20m', issuer: 'project-two-api', audience: 'project-two-client' }
+      );
+      return res.json({ mfaEnrollmentRequired: true, setupToken, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
     }
     if (!totp || !authenticator.check(totp, user.totp_secret)) {
       return res.status(401).json({ error: 'A valid authenticator code is required.', code: 'MFA_REQUIRED' });
@@ -42,7 +47,7 @@ router.post('/login', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/me', requireAuth, async (req, res, next) => {
+router.get('/me', requireAuth, require('../middleware/auth').requireFullAuth, async (req, res, next) => {
   try {
     const result = await query('SELECT id, username, email, role, is_active, totp_enabled, created_at FROM users WHERE id = $1', [req.user.sub]);
     if (!result.rows[0] || !result.rows[0].is_active) return res.status(401).json({ error: 'Account unavailable.' });
