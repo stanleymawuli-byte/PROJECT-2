@@ -1,9 +1,9 @@
 const express = require('express');
 const { z } = require('zod');
 const { query } = require('../db');
-const { requireAuth, allowRoles } = require('../middleware/auth');
+const { requireAuth, requireFullAuth, allowRoles } = require('../middleware/auth');
 const router = express.Router();
-router.use(requireAuth);
+router.use(requireAuth, requireFullAuth);
 
 router.get('/', async (req, res, next) => {
   try {
