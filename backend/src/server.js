@@ -25,7 +25,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
-app.use('/api/reports/summary', require('./middleware/auth').requireAuth, async (_req, res, next) => {
+app.use('/api/reports/summary', require('./middleware/auth').requireAuth, require('./middleware/auth').requireFullAuth, async (_req, res, next) => {
   try {
     const [users, records, recent] = await Promise.all([
       query('SELECT count(*)::int AS total, count(*) FILTER (WHERE is_active)::int AS active FROM users'),
