@@ -9,7 +9,7 @@ function requireAuth(req, res, next) {
     if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
       throw new Error('JWT_SECRET is not configured securely.');
     }
-    req.user = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+    req.user = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'], issuer: 'project-two-api', audience: 'project-two-client' });
     return next();
   } catch {
     return res.status(401).json({ error: 'Session is invalid or expired.' });
