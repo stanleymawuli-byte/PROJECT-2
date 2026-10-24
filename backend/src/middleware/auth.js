@@ -16,6 +16,11 @@ function requireAuth(req, res, next) {
   }
 }
 
+function requireFullAuth(req, res, next) {
+  if (req.user?.mfa_setup) return res.status(403).json({ error: 'Finish multi-factor enrollment before using the application.', code: 'MFA_ENROLLMENT_REQUIRED' });
+  next();
+}
+
 function allowRoles(...roles) {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -25,4 +30,4 @@ function allowRoles(...roles) {
   };
 }
 
-module.exports = { requireAuth, allowRoles };
+module.exports = { requireAuth, requireFullAuth, allowRoles };
