@@ -14,7 +14,7 @@ router.get('/', allowRoles('administrator', 'admin', 'manager'), async (req, res
   } catch (error) { next(error); }
 });
 
-router.post('/', allowRoles('administrator', 'manager'), async (req, res, next) => {
+router.post('/', allowRoles('administrator', 'admin', 'manager'), async (req, res, next) => {
   try {
     const parsed = z.object({
       username: z.string().trim().min(3).max(80).regex(/^[a-zA-Z0-9_.-]+$/),
