@@ -23,6 +23,9 @@ router.post('/', allowRoles('administrator', 'manager'), async (req, res, next) 
       role: z.enum(['admin', 'manager', 'inputer', 'viewer']),
     }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Check username, email, password (12+ characters), and role.' });
+    if (req.user.role === 'manager' && parsed.data.role === 'admin') {
+      return res.status(403).json({ error: 'Managers cannot create administrator accounts.' });
+    }
     const password_hash = await hashPassword(parsed.data.password);
     const { rows } = await query(
       'INSERT INTO users (username, email, password_hash, role, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, role, is_active, created_at',
