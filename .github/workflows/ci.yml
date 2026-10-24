@@ -1,0 +1,33 @@
+name: Project Two checks
+on:
+  push:
+    branches: [main, "build/**"]
+  pull_request:
+    branches: [main]
+jobs:
+  backend-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+      - name: Check backend JavaScript syntax
+        working-directory: backend
+        run: npm run check
+  web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install web dependencies
+        working-directory: frontend
+        run: npm install
+      - name: Build web frontend
+        working-directory: frontend
+        run: npm run build
