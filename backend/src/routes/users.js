@@ -1,11 +1,11 @@
 const express = require('express');
 const { z } = require('zod');
 const { query } = require('../db');
-const { requireAuth, allowRoles } = require('../middleware/auth');
+const { requireAuth, requireFullAuth, allowRoles } = require('../middleware/auth');
 const { hashPassword } = require('../security/passwords');
 
 const router = express.Router();
-router.use(requireAuth);
+router.use(requireAuth, requireFullAuth);
 
 router.get('/', allowRoles('administrator', 'admin', 'manager'), async (req, res, next) => {
   try {
